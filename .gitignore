@@ -1,1 +1,4 @@
-*.pyc
+uploads/*.jpg
+uploads/*.png
+models/*.h5
+models/*.p
