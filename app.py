@@ -6,12 +6,12 @@ import glob
 import re
 import numpy as np
 
-# Keras
+#bibliotecas Keras
 from keras.applications.imagenet_utils import preprocess_input, decode_predictions
 from keras.models import load_model
 from keras.preprocessing import image
 
-# Flask utils
+#bibliotecas Flask
 from flask import Flask, redirect, url_for, request, render_template
 from werkzeug.utils import secure_filename
 from gevent.wsgi import WSGIServer
@@ -19,13 +19,21 @@ from gevent.wsgi import WSGIServer
 # Define a flask app
 app = Flask(__name__)
 
-# Model saved with Keras model.save()
+# Carrega o modelo keras salvo
 MODEL_PATH = 'models/basicCNN.h5'
-
-# Load your trained model
 model = load_model(MODEL_PATH)
-model._make_predict_function()          # Necessary
-print('Model loaded. Start serving...')
+model._make_predict_function() # Necessário para funcionar
+print('Modelo carregado')
+
+#Carrega as labels utilizadas pelo Modelo
+label_dict = dict()
+with open('static/files/list_category_cloth.txt') as f:
+    lineno = 1
+    for line in f:
+        arglist = ' '.join(line.split()).split(' ')
+        label_dict.update({lineno:arglist[0]})
+        lineno += 1
+
 
 # You can also use pretrained model from Keras
 # Check https://keras.io/applications/
@@ -74,7 +82,7 @@ def upload():
         # Process your result for human
         pred_class = preds.argmax(axis=-1)            # Simple argmax
         #pred_class = decode_predictions(preds, top=1)   # ImageNet Decode
-        result = str(pred_class)               # Convert to string
+        result = label_dict.get(int(pred_class))             # Convert to string
         return result
     return None
 
